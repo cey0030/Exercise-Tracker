@@ -17,7 +17,7 @@ mongoose
 var Schema = mongoose.Schema
 var userSchema = new mongoose.Schema({
   username: String,
-  logs: [{
+  log: [{
     description: {type: String, required: true},
     duration: {type: Number, required: true},
     date: Date
@@ -56,27 +56,44 @@ app.get('/api/exercise/users', function(req, res) {
 })
 
 app.post('/api/exercise/add', function(req, res) {
-  User.findByIdAndUpdate(req.body.userId
-  ,
-  {$push: 
-   {
-    logs: 
-    {
-      description: req.body.description,
-      duration: parseInt(req.body.duration),
-      date: req.body.date ? new Date(req.body.date) : new Date()
-    }
-  }
-}, {new: true, findAndModify: false, upsert: true}, function (error, data) {
-    if (error) console.log(error) 
-    let info = data.logs[data.logs.length-1]
-    res.json({
-      username: data.username,
-      description: info.description,
-      duration: parseInt(info.duration),
-      _id: req.body.userId,
-      date: new Date(info.date).toDateString() 
+    User.findByIdAndUpdate(req.body.userId, {
+        $push: {
+            log: {
+                description: req.body.description,
+                duration: parseInt(req.body.duration),
+                date: req.body.date ? new Date(req.body.date) : new Date()
+            }
+        }
+    }, {
+        new: true,
+        findAndModify: false,
+        upsert: true
+    }, function(error, data) {
+        if (error) console.log(error)
+        let info = data.log[data.log.length - 1]
+        res.json({
+            username: data.username,
+            description: info.description,
+            duration: parseInt(info.duration),
+            _id: req.body.userId,
+            date: new Date(info.date).toDateString()
+        })
     })
+})
+
+app.get('/api/exercise/log', function(req, res) {
+  console.log(req.query.userId)
+  User.findById({
+    _id: req.query.userId
+  }, function(error, data) {
+    if (error) console.log(error)
+    console.log(data.log)
+    res.json({
+            _id: req.query.userId,
+            username: data.username,
+            count: data.log.length,
+            log: data.log
+        })
   })
 })
 // End of challenge code 
