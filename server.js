@@ -18,8 +18,8 @@ var Schema = mongoose.Schema
 var userSchema = new mongoose.Schema({
   username: String,
   logs: [{
-    description: String,
-    duration: Number,
+    description: {type: String, required: true},
+    duration: {type: Number, required: true},
     date: Date
   }]
 })
@@ -61,21 +61,20 @@ app.post('/api/exercise/add', function(req, res) {
   {$push: 
    {
     logs: 
-    [{
+    {
       description: req.body.description,
-      duration: req.body.duration,
-      date: req.body.date ? req.body.date : new Date()
-    }]
+      duration: parseInt(req.body.duration),
+      date: req.body.date ? new Date(req.body.date) : new Date()
+    }
   }
-}, {new: true, findAndModify:false}, function (error, data) {
-    if (error) console.log(error) // data is not defined
-    console.log(data)
+}, {new: true, findAndModify: false, upsert: true}, function (error, data) {
+    if (error) console.log(error) 
     let info = data.logs[data.logs.length-1]
     res.json({
       username: data.username,
       description: info.description,
-      duration: info.duration,
-      _id: info.userId,
+      duration: parseInt(info.duration),
+      _id: req.body.userId,
       date: new Date(info.date).toDateString() 
     })
   })
