@@ -49,7 +49,7 @@ app.get('/api/exercise/users', function(req, res) {
     username: 1
   }, (error, data) => {
     if (error) console.log(error)
-    res.json(data)
+    res.send(data)
   })
 })
 // End of challenge code 
