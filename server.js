@@ -1,6 +1,3 @@
-const dotenv = require('dotenv')
-dotenv.config({ path: './config.env' });
-
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
@@ -9,8 +6,13 @@ const cors = require('cors')
 
 const mongoose = require('mongoose')
 
-mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/exercise-track', {useNewUrlParser: true, useUnifiedTopology: true});
-
+mongoose
+  .connect(
+    'mongodb://Clement:clement@cluster0-shard-00-00-yghgs.mongodb.net:27017,cluster0-shard-00-01-yghgs.mongodb.net:27017,cluster0-shard-00-02-yghgs.mongodb.net:27017/Cluster0?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority' || 'mongodb://localhost/exercise-track',
+    { useNewUrlParser: true }
+  )
+  .then(() => console.log('MongoDB Connected...'))
+  .catch(err => console.log(err));
 // Start of challenge code
 var Schema = mongoose.Schema
 var userSchema = new mongoose.Schema({
@@ -18,7 +20,7 @@ var userSchema = new mongoose.Schema({
   logs: [{
     description: String,
     duration: Number,
-    date: String
+    date: Date
   }]
 })
 
@@ -50,6 +52,32 @@ app.get('/api/exercise/users', function(req, res) {
   }, (error, data) => {
     if (error) console.log(error)
     res.send(data)
+  })
+})
+
+app.post('/api/exercise/add', function(req, res) {
+  User.findByIdAndUpdate(req.body.userId
+  ,
+  {$push: 
+   {
+    logs: 
+    [{
+      description: req.body.description,
+      duration: req.body.duration,
+      date: req.body.date ? req.body.date : new Date()
+    }]
+  }
+}, {new: true, findAndModify:false}, function (error, data) {
+    if (error) console.log(error) // data is not defined
+    console.log(data)
+    let info = data.logs[data.logs.length-1]
+    res.json({
+      username: data.username,
+      description: info.description,
+      duration: info.duration,
+      _id: info.userId,
+      date: new Date(info.date).toDateString() 
+    })
   })
 })
 // End of challenge code 
