@@ -41,10 +41,10 @@ app.post('/api/exercise/new-user', function(req, res) {
   var user = new User({
     username: req.body.username
   })
-  user.save((error) => {
+  user.save((error, data) => {
     if (error) console.log(error)
+    res.json(data)
   })
-  res.json({'username': req.body.username, '_id':""})
 })
 
 app.get('/api/exercise/users', function(req, res) {
@@ -83,7 +83,6 @@ app.post('/api/exercise/add', function(req, res) {
 })
 
 app.get('/api/exercise/log', function(req, res) {
-  console.log(req.query.userId)
   User.findById({
     _id: req.query.userId
   }, function(error, data) {
