@@ -83,18 +83,44 @@ app.post('/api/exercise/add', function(req, res) {
 })
 
 app.get('/api/exercise/log', function(req, res) {
-  User.findById({
-    _id: req.query.userId
-  }, function(error, data) {
-    if (error) console.log(error)
-    console.log(data.log)
-    res.json({
-            _id: req.query.userId,
-            username: data.username,
-            count: data.log.length,
-            log: data.log
+  if (!req.query.from && !req.query.to && !req.query.limit) {
+    User.findById({
+      _id: req.query.userId
+    }, function(error, data) {
+      if (error) console.log(error)
+      console.log(data.log)
+      res.json({
+              _id: req.query.userId,
+              username: data.username,
+              count: data.log.length,
+              log: data.log
+          })
+    })
+  } else {
+    if (req.query.limit) {
+      var data = User.findById({
+      _id: req.query.userId
+    }, function(error, data) {
+      if (error) console.log(error)
+      // Retrieve part of the log
+        res.json({
+          log: data.log.slice(0, req.query.limit)
         })
-  })
+      })
+    }
+    if (req.query.from && req.query.to) {
+      User.findById({
+        _id: req.query.userId
+      }, function(error, data) {
+      if (error) console.log(error)
+        // Retrieve part of the log
+        // console.log(data.log.filter(date => this.date >= new Date(req.query.from) && new Date(req.query.to) >= this.date))
+        res.json({
+          log: data.log.filter(date => date.date >= new Date(req.query.from) && new Date(req.query.to) >= date.date)
+        })
+      })
+    }
+  }
 })
 // End of challenge code 
 
