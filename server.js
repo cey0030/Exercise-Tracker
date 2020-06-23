@@ -1,4 +1,3 @@
-// Glitch link: https://glitch.com/edit/#!/speckled-continuous-penguin?path=server.js%3A1%3A0
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
