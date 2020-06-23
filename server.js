@@ -104,7 +104,6 @@ app.get('/api/exercise/log', function(req, res) {
       _id: req.query.userId
     }, function(error, data) {
       if (error) console.log(error)
-      // Retrieve part of the log
         res.json({
           log: data.log.slice(0, req.query.limit)
         })
@@ -115,8 +114,6 @@ app.get('/api/exercise/log', function(req, res) {
         _id: req.query.userId
       }, function(error, data) {
       if (error) console.log(error)
-        // Retrieve part of the log
-        // console.log(data.log.filter(date => this.date >= new Date(req.query.from) && new Date(req.query.to) >= this.date))
         res.json({
           log: data.log.filter(date => date.date >= new Date(req.query.from) && new Date(req.query.to) >= date.date)
         })
